@@ -1,0 +1,12 @@
+grid 4 3
+(4;1;0)
+edge v11 v12 2 both
+role v0 green
+role v11 red
+start v5
+neighbors v5
+method monte_carlo samples=10000 seed=42 max_steps=1000
+save graph.json
+info
+result
+quit

@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "graph": {
+    "dimension": 1,
+    "revision": 0,
+    "vertices": [
+      {
+        "id": "v0",
+        "coordinates": [
+          0
+        ],
+        "role": "ordinary"
+      },
+      {
+        "id": "v1",
+        "coordinates": [
+          1
+        ],
+        "role": "green"
+      },
+      {
+        "id": "v2",
+        "coordinates": [
+          2
+        ],
+        "role": "red"
+      }
+    ],
+    "edges": [
+      {
+        "source_id": "v0",
+        "target_id": "v1",
+        "weight": 2
+      },
+      {
+        "source_id": "v0",
+        "target_id": "v2",
+        "weight": 5
+      }
+    ],
+    "start_id": "v0"
+  }
+}

@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+graph.svg
+docs/verification.md
+Ch1_week3_Vavilov.docx
