@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="ru">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Графы и вероятности</title>
+<style>
+body{font:16px/1.5 system-ui,sans-serif;color:#182c38;background:#f3f6f8;margin:0}main{max-width:1000px;margin:32px auto;padding:24px;background:white;border-radius:12px}h1{margin-top:0}section{border-top:1px solid #dbe3e8;margin-top:24px;padding-top:18px}label{display:inline-block;margin:8px 16px 8px 0}button,select,input,textarea{font:inherit;padding:8px;border:1px solid #9aaebc;border-radius:5px}button{cursor:pointer;background:#e7f2fa}textarea{display:block;width:96%;font-family:monospace}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#f3f6f8;padding:12px}table{border-collapse:collapse;width:100%}td,th{padding:8px;border-bottom:1px solid #dbe3e8;text-align:left}#status{min-height:24px}#history[hidden]{display:none}input[type=range]{width:50%}
+</style></head>
+<body><main><h1>Графы и вероятности</h1><p>Загрузите JSON, выберите старт и метод. История показывает состояние расчёта на каждом шаге.</p>
+<form hidden>{% csrf_token %}</form>
+<section><h2>1. Граф</h2>
+<label>JSON-файл <input type="file" id="file" accept=".json,application/json"></label><br>
+<label>Пример <select id="example"><option value="">Выберите граф</option></select></label><button id="load">Загрузить пример</button>
+<details><summary>Вставить JSON вручную</summary><textarea id="json" rows="8" aria-label="JSON графа"></textarea><button id="validate">Загрузить JSON</button></details>
+<p id="graph-info">Граф ещё не загружен.</p></section>
+<section><h2>2. Расчёт</h2>
+<label>Старт <select id="start" aria-label="Старт"></select></label>
+<label>Метод <select id="method"><option value="exact">Решение системы</option><option value="relaxation">Последовательная релаксация</option><option value="finite_horizon">Конечный горизонт</option><option value="monte_carlo">Монте-Карло</option></select></label>
+<label for="parameters">Параметры метода (JSON)</label><textarea id="parameters" rows="2">{}</textarea><br>
+<button id="run" disabled>Рассчитать</button> <button id="download" disabled>Сохранить граф и расчёт</button>
+<p id="status" role="status"></p><pre id="result">Результат появится после расчёта.</pre></section>
+<section id="history" hidden><h2>3. История</h2>
+<button id="previous">Назад</button> <input id="step" aria-label="Шаг истории" type="range" min="0" value="0"> <button id="next">Вперёд</button>
+<p id="step-info"></p><table><thead id="columns"></thead><tbody id="values"></tbody></table></section>
+</main>
+{{ labels|json_script:"display-labels" }}
+<script>
+const $ = id => document.getElementById(id);
+const defaults = {exact:{}, relaxation:{tolerance:0.000001,max_iterations:10000},finite_horizon:{T:2},monte_carlo:{samples:10000,seed:42,max_steps:2,batch_size:1000}};
+let documentData = null, runData = null;
+const displayLabels = JSON.parse($('display-labels').textContent);
+const exampleNames = {'example1_line5.json':'Пример 1: отрезок', 'example3_grid.json':'Пример 3: граф из задания', 'example3_small.json':'Пример 3: малый граф', 'example4_weighted.json':'Пример 4: неравные веса', 'example5_unreachable.json':'Пример 5: недостижимая цель', 'example6_lattice3d.json':'Пример 6: трёхмерная решётка', 'grid_1d.json':'Одномерная решётка', 'grid_2d.json':'Двумерная решётка', 'grid_3d.json':'Трёхмерная решётка', 'weighted.json':'Граф с неравными весами', 'weighted2d.json':'Двумерный граф с весами'};
+function displayData(value, vertexIds=false) {
+ if(value === null) return 'не задано';
+ if(typeof value === 'boolean') return value ? 'да' : 'нет';
+ if(Array.isArray(value)) return value.map(item=>displayData(item));
+ if(typeof value !== 'object') return value;
+ return Object.fromEntries(Object.entries(value).map(([key,item])=>[vertexIds ? key : (displayLabels[key] || key), displayData(item,!vertexIds && ['probabilities','reference','by_vertex'].includes(key))]));
+}
+const csrf = document.querySelector('[name=csrfmiddlewaretoken]').value;
+async function api(url, data) {
+ const response = await fetch(url, data === undefined ? {} : {method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':csrf},body:JSON.stringify(data)});
+ const result = await response.json();
+ if (!response.ok) throw new Error(result.error ? result.error.message : `Сервер вернул ошибку: код ${response.status}`);
+ return result;
+}
+async function action(work) {try { $('status').textContent=''; await work(); } catch(error) { $('status').textContent=error instanceof SyntaxError ? 'Некорректный JSON. Проверьте формат данных.' : error instanceof TypeError ? 'Не удалось обработать данные или связаться с сервером.' : error instanceof DOMException ? 'Не удалось прочитать выбранный файл.' : error.message; }}
+function setGraph(data) {
+ documentData=data;runData=null;$('history').hidden=true;$('download').disabled=true;
+ $('result').textContent='Граф загружен. Запустите расчёт.';$('json').value=JSON.stringify(data,null,2);
+ $('start').replaceChildren(...data.graph.vertices.map(v=>new Option(v.id,v.id)));
+ if(data.graph.start_id !== null) $('start').value=data.graph.start_id;
+ $('graph-info').textContent=`Вершин: ${data.graph.vertices.length}, переходов: ${data.graph.edges.length}, тип: ${data.graph.kind === 'lattice' ? 'решётка' : 'обычный граф'}`;
+ $('run').disabled=false;$('status').textContent='Граф загружен.';
+}
+$('load').onclick=()=>action(async()=>setGraph((await api(`/api/examples/${encodeURIComponent($('example').value)}/`)).document));
+$('validate').onclick=()=>action(async()=>setGraph((await api('/api/graph/validate/',JSON.parse($('json').value))).document));
+$('file').onchange=()=>action(async()=>{if($('file').files.length) setGraph((await api('/api/graph/validate/',JSON.parse(await $('file').files[0].text()))).document);});
+$('method').onchange=()=>{$('parameters').value=JSON.stringify(defaults[$('method').value]);};
+function showStep() {
+ const item=runData.history[Number($('step').value)]; if(!item)return;
+ let headers,rows;
+ if(item.probabilities){
+  $('step-info').textContent=`Итерация ${item.iteration}. Максимальное абсолютное отклонение от эталона: ${item.max_abs_error}`;
+  headers=['Вершина','Вероятность зелёной цели'];rows=Object.entries(item.probabilities).map(([id,p])=>[id,p]);
+ }else if(item.by_vertex){
+  $('step-info').textContent=`Шаг ${item.step}`;headers=['Вершина','Вероятность зелёной цели','Вероятность красной цели','Без попадания'];rows=Object.entries(item.by_vertex).map(([id,v])=>[id,v.P,v.Q,v.U]);
+ }else{
+  $('step-info').textContent=`Испытаний: ${item.trials}`;headers=['Вероятность зелёной цели','Вероятность красной цели','Без попадания'];rows=[[item.P,item.Q,item.U]];
+ }
+ const cells=(tag,values)=>values.map(value=>{const cell=document.createElement(tag);cell.textContent=String(value);return cell;});
+ const head=document.createElement('tr');head.append(...cells('th',headers));$('columns').replaceChildren(head);
+ $('values').replaceChildren(...rows.map(values=>{const row=document.createElement('tr');row.append(...cells('td',values));return row;}));
+ $('previous').disabled=Number($('step').value)===0;$('next').disabled=Number($('step').value)===runData.history.length-1;
+}
+$('run').onclick=()=>action(async()=>{
+ $('run').disabled=true;$('status').textContent='Расчёт…';
+ try{
+ runData=await api('/api/run/',{document:documentData,method:$('method').value,start_id:$('start').value,parameters:JSON.parse($('parameters').value)});
+ documentData=runData.document;$('result').textContent=JSON.stringify(displayData(runData.result),null,2);$('download').disabled=false;
+ $('history').hidden=runData.history.length===0;$('step').max=Math.max(0,runData.history.length-1);$('step').value=0;showStep();$('status').textContent='Расчёт завершён.';
+ }finally{$('run').disabled=false;}
+});
+$('step').oninput=showStep;
+$('previous').onclick=()=>{$('step').value=Number($('step').value)-1;showStep();};
+$('next').onclick=()=>{$('step').value=Number($('step').value)+1;showStep();};
+$('download').onclick=()=>{const url=URL.createObjectURL(new Blob([JSON.stringify(documentData,null,2)],{type:'application/json'}));const link=document.createElement('a');link.href=url;link.download='граф-результат.json';link.click();URL.revokeObjectURL(url);};
+action(async()=>{const data=await api('/api/examples/');$('example').append(...data.examples.map((name,index)=>new Option(exampleNames[name] || `Пример ${index+1}`,name)));});
+</script></body></html>

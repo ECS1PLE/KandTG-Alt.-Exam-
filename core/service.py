@@ -9,7 +9,7 @@ from .model import Edge, Graph, Vertex
 
 
 class GraphService:
-    """Единая точка изменения. Новый снимок публикуется только после проверки."""
+
 
     def __init__(self, graph=None):
         self.graph = graph or Graph()
@@ -32,13 +32,13 @@ class GraphService:
             g = self.graph
             require(expected_revision is None or (type(expected_revision) is int and expected_revision == g.revision),
                     "REVISION_CONFLICT", "Граф изменился. Обновите снимок и повторите команду.", "expected_revision")
-            require(isinstance(payload, dict), "INVALID_COMMAND", "payload должен быть объектом.", "payload")
+            require(isinstance(payload, dict), "INVALID_COMMAND", "Данные команды должны быть объектом.", "payload")
             extra = self.extra
             selected_id = None
             try:
                 if kind == "generate":
                     candidate = grid(payload["shape"], payload.get("spacing", 1), payload.get("origin"), payload.get("weight", 1))
-                    extra = {} 
+                    extra = {}
                 elif kind == "add_vertex":
                     coords = parse_point(payload["point"], g.dimension) if "point" in payload else tuple(payload["coordinates"])
                     existing = g.by_id
@@ -55,7 +55,7 @@ class GraphService:
                     candidate = replace(g, start_id=payload["vertex_id"])
                 elif kind == "add_edge":
                     source, target, weight = payload["source_id"], payload["target_id"], payload.get("weight", 1)
-                    require(type(payload.get("bidirectional", False)) is bool, "INVALID_COMMAND", "bidirectional должен быть bool.")
+                    require(type(payload.get("bidirectional", False)) is bool, "INVALID_COMMAND", "Признак двустороннего перехода должен быть логическим значением.")
                     new = (Edge(source, target, weight),)
                     if payload.get("bidirectional", False):
                         new += (Edge(target, source, weight),)
@@ -72,5 +72,9 @@ class GraphService:
                 from .errors import GraphError
                 raise GraphError("INVALID_COMMAND", "Проверьте обязательные поля и их типы.", "payload") from error
             self.graph = replace(candidate, revision=g.revision + 1)
-            self.extra = extra
+            self.extra = deepcopy(extra)
+
+            if "run" in self.extra:
+                self.extra["run"] = {k: v for k, v in self.extra["run"].items()
+                                     if k in ("method", "parameters")}
             return {"document": self.document(), "selected_id": selected_id}

@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "description": "Пример 1: Отрезок от 0 до 4 (Проверка поглощения и релаксации)",
+  "graph": {
+    "kind": "graph",
+    "dimension": 2,
+    "revision": 0,
+    "vertices": [
+      {
+        "id": "0",
+        "role": 2
+      },
+      {
+        "id": "1",
+        "role": 0
+      },
+      {
+        "id": "2",
+        "role": 0
+      },
+      {
+        "id": "3",
+        "role": 0
+      },
+      {
+        "id": "4",
+        "role": 1
+      }
+    ],
+    "edges": [
+      {
+        "source_id": "0",
+        "target_id": "1",
+        "weight": 1
+      },
+      {
+        "source_id": "1",
+        "target_id": "0",
+        "weight": 1
+      },
+      {
+        "source_id": "1",
+        "target_id": "2",
+        "weight": 1
+      },
+      {
+        "source_id": "2",
+        "target_id": "1",
+        "weight": 1
+      },
+      {
+        "source_id": "2",
+        "target_id": "3",
+        "weight": 1
+      },
+      {
+        "source_id": "3",
+        "target_id": "2",
+        "weight": 1
+      },
+      {
+        "source_id": "3",
+        "target_id": "4",
+        "weight": 1
+      },
+      {
+        "source_id": "4",
+        "target_id": "3",
+        "weight": 1
+      }
+    ],
+    "start_id": "2"
+  }
+}

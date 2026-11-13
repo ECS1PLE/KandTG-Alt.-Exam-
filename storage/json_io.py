@@ -12,23 +12,24 @@ MAX_FILE_BYTES = 20 * 1024 * 1024
 def decode_document(document):
     require(isinstance(document, dict), "INVALID_FORMAT", "Корень JSON должен быть объектом.", "$")
     require(type(document.get("schema_version")) is int and document["schema_version"] == 1,
-            "UNSUPPORTED_VERSION", "Поддерживается schema_version = 1.", "schema_version")
+            "UNSUPPORTED_VERSION", "Поддерживается версия схемы 1.", "schema_version")
     try:
         g = document["graph"]
         vertices, edges = g["vertices"], g["edges"]
-        require(isinstance(vertices, list) and isinstance(edges, list), "INVALID_FORMAT", "vertices и edges должны быть массивами.")
+        require(isinstance(vertices, list) and isinstance(edges, list), "INVALID_FORMAT", "Вершины и рёбра должны быть массивами.")
         require(len(vertices) <= MAX_VERTICES and len(edges) <= MAX_EDGES,
                 "GRAPH_TOO_LARGE", "Превышен допустимый размер графа.")
-        require(all(isinstance(v.get("coordinates"), list) for v in vertices),
-                "INVALID_FORMAT", "coordinates должен быть массивом.", "graph.vertices")
-        graph = Graph(g["dimension"], g["revision"],
-                      tuple(Vertex(v["id"], tuple(v["coordinates"]), v["role"]) for v in vertices),
-                      tuple(Edge(e["source_id"], e["target_id"], e["weight"]) for e in edges), g["start_id"])
+        require(all("coordinates" not in v or isinstance(v["coordinates"], list) for v in vertices),
+                "INVALID_FORMAT", "Координаты должны быть массивом.", "graph.vertices")
+        graph = Graph(dimension=g.get("dimension", 2), revision=g.get("revision", 0),
+                      vertices=tuple(Vertex(v["id"], tuple(v["coordinates"]) if "coordinates" in v else None, v["role"]) for v in vertices),
+                      edges=tuple(Edge(e["source_id"], e["target_id"], e["weight"]) for e in edges),
+                      start_id=g.get("start_id"), kind=g.get("kind", "graph"))
     except (KeyError, TypeError, AttributeError) as error:
         raise GraphError("INVALID_FORMAT", "Проверьте обязательные поля и типы JSON.") from error
     extra = {k: document[k] for k in ("run", "view") if k in document}
     for key, value in extra.items():
-        require(isinstance(value, dict), "INVALID_FORMAT", f"{key} должен быть объектом.", key)
+        require(isinstance(value, dict), "INVALID_FORMAT", "Настройки расчёта и вида должны быть объектами.", key)
     try:
         json.dumps(document, allow_nan=False)
     except (ValueError, TypeError) as error:
@@ -47,7 +48,8 @@ def load_document(path):
 
 
 def save_document(path, document):
-    decode_document(document)
+    graph, extra = decode_document(document)
+    document = {"schema_version": 1, "graph": graph.to_dict(), **extra}
     p = Path(path)
     p.parent.mkdir(parents=True, exist_ok=True)
     temp = None

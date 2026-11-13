@@ -1,11 +1,11 @@
-"""Отрисовка SVG без сторонних пакетов и графических окон."""
 import os
 import tempfile
-from math import isfinite
+from math import isfinite, cos, sin, tau
 from pathlib import Path
 import xml.etree.ElementTree as ET
 
 from core.projection import project
+from .presentation import ROLE_NAMES
 
 SVG = "http://www.w3.org/2000/svg"
 ET.register_namespace("", SVG)
@@ -16,6 +16,11 @@ def element(parent, tag, **attributes):
 
 
 def screen_points(graph, rotation=(0, 0, 0)):
+    if any(v.coordinates is None for v in graph.vertices):
+
+        n = len(graph.vertices)
+        return {v.id: (500 + 330 * cos(tau * i / n), 350 + 240 * sin(tau * i / n), 0)
+                for i, v in enumerate(graph.vertices)}
     scale = max((abs(x) for v in graph.vertices for x in v.coordinates), default=1)
     scale = max(1, scale)
     xyz = {v.id: tuple(x / scale for x in v.coordinates) + (0,) * (3 - graph.dimension) for v in graph.vertices}
@@ -34,7 +39,7 @@ def render_svg(graph, selected_id=None, rotation=(0, 0, 0)):
     root = ET.Element(f"{{{SVG}}}svg", {"viewBox": "0 0 1000 700", "width": "1000", "height": "700", "role": "img"})
     element(root, "title").text = "Граф из консольной программы Ч 1"
     element(root, "rect", width=1000, height=700, fill="white")
-    element(root, "text", x=30, y=35, fill="black", font_family="sans-serif", font_size=20).text = f"{graph.dimension}D | V={len(graph.vertices)} | arcs={len(graph.edges)} | revision={graph.revision}"
+    element(root, "text", x=30, y=35, fill="black", font_family="sans-serif", font_size=20).text = f"Размерность: {graph.dimension} | Вершин: {len(graph.vertices)} | Переходов: {len(graph.edges)} | Редакция: {graph.revision}"
     defs = element(root, "defs")
     marker = element(defs, "marker", id="arrow", viewBox="0 0 10 10", refX=10, refY=5, markerWidth=6, markerHeight=6, orient="auto")
     element(marker, "path", d="M 0 0 L 10 5 L 0 10 z", fill="#777777")
@@ -53,19 +58,19 @@ def render_svg(graph, selected_id=None, rotation=(0, 0, 0)):
         line = element(root, "line", x1=x, y1=y, x2=u, y2=v, stroke="#999999", stroke_width=1.5)
         if not reverse:
             line.set("marker-end", "url(#arrow)")
-        element(line, "title").text = f"{edge.source_id} -> {edge.target_id}; weight={edge.weight}"
+        element(line, "title").text = f"{edge.source_id} → {edge.target_id}; вес={edge.weight}"
     colors = {"ordinary": "#eeeeee", "green": "#86efac", "red": "#fca5a5"}
     for vertex in sorted(graph.vertices, key=lambda v: points[v.id][2]):
         x, y, _ = points[vertex.id]
         group = element(root, "g", id=vertex.id)
-        element(group, "title").text = f"{vertex.id}: {vertex.coordinates}; role={vertex.role}"
+        element(group, "title").text = f"{vertex.id}: координаты={vertex.coordinates if vertex.coordinates is not None else 'не заданы'}; роль={ROLE_NAMES[vertex.role]}"
         element(group, "circle", cx=x, cy=y, r=8, fill=colors[vertex.role], stroke="black", stroke_width=3 if vertex.id == selected_id else 1)
         if len(graph.vertices) <= 250 or vertex.id == selected_id:
-            suffix = " S" if vertex.id == graph.start_id else ""
+            suffix = " (старт)" if vertex.id == graph.start_id else ""
             element(group, "text", x=x+12, y=y-10, fill="black", font_family="sans-serif", font_size=12).text = vertex.id + suffix
     if not graph.vertices:
         element(root, "text", x=350, y=350, fill="black", font_family="sans-serif", font_size=18).text = "Граф пуст. Добавьте точки или создайте решётку."
-    element(root, "text", x=30, y=675, fill="black", font_family="sans-serif", font_size=13).text = "ordinary — обычная; green — зелёная; red — красная; S — старт"
+    element(root, "text", x=30, y=675, fill="black", font_family="sans-serif", font_size=13).text = "Серые — обычные вершины; зелёные и красные — целевые; старт отмечен подписью"
     return ET.tostring(root, encoding="utf-8", xml_declaration=True)
 
 

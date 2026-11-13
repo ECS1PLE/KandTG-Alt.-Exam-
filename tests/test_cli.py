@@ -41,7 +41,7 @@ class CLITests(unittest.TestCase):
         self.cli.execute('(1;;0)')
         self.assertIs(self.cli.service.graph, graph)
         self.assertEqual(image, (self.path/'graph.svg').read_bytes())
-        self.assertIn('INVALID_POINT', self.output.getvalue())
+        self.assertIn('В скобках нужны три числа', self.output.getvalue())
 
     def test_invalid_grid_command_keeps_cli_alive(self):
         for command in ['grid', 'grid 1 2 --unknown', 'grid text', 'grid 0', '"unterminated']:
@@ -82,7 +82,7 @@ class CLITests(unittest.TestCase):
         path.write_text('{"schema_version":99}', encoding='utf-8')
         self.cli.execute(f'open "{path.as_posix()}"')
         self.assertIs(self.cli.service.graph, before)
-        self.assertIn('UNSUPPORTED_VERSION', self.output.getvalue())
+        self.assertIn('Поддерживается версия схемы 1', self.output.getvalue())
 
     def test_method_parameters_are_atomic_and_no_fake_result(self):
         self.cli.execute('method monte_carlo samples=100')
@@ -91,7 +91,7 @@ class CLITests(unittest.TestCase):
         self.assertIs(self.cli.service.extra['run'], old)
         self.cli.execute('run')
         self.cli.execute('result')
-        self.assertIn('METHOD_NOT_AVAILABLE', self.output.getvalue())
+        self.assertIn('выберите существующую стартовую вершину', self.output.getvalue())
         self.assertIn('Результат отсутствует', self.output.getvalue())
 
     def test_rotation_keeps_mathematical_model(self):
@@ -109,7 +109,7 @@ class CLITests(unittest.TestCase):
             self.cli.execute('(2;0;0)')
         self.assertEqual(len(self.cli.service.graph.vertices), 3)
         self.assertEqual(previous, (self.path/'graph.svg').read_bytes())
-        self.assertIn('SVG_WRITE_FAILED', self.output.getvalue())
+        self.assertIn('Ошибка записи изображения', self.output.getvalue())
 
     def test_svg_escaping_and_large_coordinates(self):
         graph = Graph(dimension=3, vertices=(Vertex('<a&b>', (1e308,1e308,1e308)), Vertex('other', (-1e308,-1e308,-1e308))), edges=(Edge('<a&b>','other'),))
@@ -125,19 +125,16 @@ class CLITests(unittest.TestCase):
         root = Path(__file__).resolve().parents[1]
         result = subprocess.run([sys.executable, '-S', str(root/'main.py'), '--script', str(script), '--svg', str(self.path/'batch.svg')], capture_output=True, text=True, timeout=10)
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertIn('V=5, arcs=8, revision=2', result.stdout)
-        self.assertIn('INVALID_POINT', result.stdout)
+        self.assertIn('вершин=5, переходов=8, редакция=2', result.stdout)
+        self.assertIn('В скобках нужны три числа', result.stdout)
         self.assertTrue((self.path/'batch.svg').is_file())
 
-    def test_only_standard_library_imports(self):
+    def test_editor_imports_without_optional_dependencies(self):
         root = Path(__file__).resolve().parents[1]
-        local = {'app','core','storage','methods'}
-        for path in root.rglob('*.py'):
-            for node in ast.walk(ast.parse(path.read_text(encoding='utf-8'))):
-                names = [x.name for x in node.names] if isinstance(node, ast.Import) else [node.module] if isinstance(node, ast.ImportFrom) and not node.level else []
-                for name in names:
-                    if name:
-                        self.assertIn(name.split('.')[0], sys.stdlib_module_names | local, f'{path}: {name}')
+        process = subprocess.run([sys.executable, '-S', '-c',
+                                  'import app.cli; import sys; assert not any(n in sys.modules for n in ("scipy", "numpy", "matplotlib", "django"))'],
+                                 cwd=root, capture_output=True, text=True, timeout=10)
+        self.assertEqual(process.returncode, 0, process.stderr)
 
 
 if __name__ == '__main__':

@@ -1,4 +1,3 @@
-"""Прямоугольные решётки с соседями вдоль осей без диагоналей и замыкания."""
 from math import prod
 
 from .errors import require
@@ -16,6 +15,8 @@ def grid(shape, spacing=1.0, origin=None, weight=1.0) -> Graph:
     require(is_number(weight) and weight > 0, "INVALID_WEIGHT",
             "Вес должен быть конечным положительным числом.", "weight")
     d = len(shape)
+    require(origin is None or isinstance(origin, (list, tuple)),
+            "INVALID_ORIGIN", "Начало должно быть массивом координат.", "origin")
     origin = (0.0,) * d if origin is None else tuple(origin)
     require(len(origin) == d and all(is_number(x) for x in origin),
             "INVALID_ORIGIN", "Начало должно содержать конечные координаты выбранной размерности.", "origin")
@@ -34,7 +35,7 @@ def grid(shape, spacing=1.0, origin=None, weight=1.0) -> Graph:
                 other = index + strides[axis]
                 edges.extend((Edge(f"v{index}", f"v{other}", weight),
                               Edge(f"v{other}", f"v{index}", weight)))
-    return Graph(dimension=d, vertices=tuple(vertices), edges=tuple(edges))
+    return Graph(dimension=d, vertices=tuple(vertices), edges=tuple(edges), kind="lattice")
 
 
 def grid_1d(nx, **kwargs):

@@ -9,21 +9,21 @@
         "coordinates": [
           0
         ],
-        "role": "ordinary"
+        "role": 0
       },
       {
         "id": "v1",
         "coordinates": [
           1
         ],
-        "role": "green"
+        "role": 1
       },
       {
         "id": "v2",
         "coordinates": [
           2
         ],
-        "role": "red"
+        "role": 2
       }
     ],
     "edges": [

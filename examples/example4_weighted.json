@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "graph": {
+    "kind": "graph",
+    "dimension": 2,
+    "revision": 0,
+    "vertices": [
+      {
+        "id": "start",
+        "role": 0
+      },
+      {
+        "id": "green",
+        "role": 1
+      },
+      {
+        "id": "red",
+        "role": 2
+      },
+      {
+        "id": "dead",
+        "role": 0
+      }
+    ],
+    "edges": [
+      {
+        "source_id": "start",
+        "target_id": "green",
+        "weight": 2
+      },
+      {
+        "source_id": "start",
+        "target_id": "red",
+        "weight": 5
+      },
+      {
+        "source_id": "start",
+        "target_id": "dead",
+        "weight": 3
+      }
+    ],
+    "start_id": "start"
+  }
+}

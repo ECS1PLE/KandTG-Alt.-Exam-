@@ -1,21 +1,22 @@
-graph> grid 4 3
+граф> grid 4 3
 Изображение обновлено: docs/session.svg
-graph> (4;1;0)
+граф> (4;1;0)
 Добавлена вершина v12
 Изображение обновлено: docs/session.svg
-graph> edge v11 v12 2 both
+граф> edge v11 v12 2 both
 Изображение обновлено: docs/session.svg
-graph> role v0 green
+граф> role v0 green
 Изображение обновлено: docs/session.svg
-graph> role v11 red
+граф> role v11 red
 Изображение обновлено: docs/session.svg
-graph> start v5
+граф> start v5
 Изображение обновлено: docs/session.svg
-graph> (1;;0)
-INVALID_POINT: В скобках нужны три числа через точку с запятой. [point]
-graph> info
-2D: V=13, arcs=36, revision=6, start=v5
-graph> method monte_carlo samples=10000 seed=42
-Метод настроен: monte_carlo; {'samples': 10000, 'seed': 42, 'max_steps': 1000}. Вычислительный модуль ещё не подключён.
-graph> result
-Результат отсутствует: вычислительный модуль ещё не подключён.
+граф> (1;;0)
+Ошибка: В скобках нужны три числа через точку с запятой.
+граф> info
+Размерность: 2; вершин=13, переходов=36, редакция=6, старт=v5
+граф> method monte_carlo samples=10000 seed=42
+Метод настроен: Монте-Карло.
+Число испытаний: 10000; начальное значение генератора: 42; лимит шагов: 1000.
+граф> result
+Результат отсутствует. Выполните run.

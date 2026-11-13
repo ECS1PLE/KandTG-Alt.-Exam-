@@ -1,0 +1,198 @@
+{
+  "schema_version": 1,
+  "description": "Пример 3: Граф из задания (Сетка a-f)",
+  "graph": {
+    "kind": "graph",
+    "dimension": 2,
+    "revision": 0,
+    "vertices": [
+      {
+        "id": "a",
+        "role": 0
+      },
+      {
+        "id": "b",
+        "role": 0
+      },
+      {
+        "id": "c",
+        "role": 0
+      },
+      {
+        "id": "d",
+        "role": 0
+      },
+      {
+        "id": "e",
+        "role": 0
+      },
+      {
+        "id": "f",
+        "role": 0
+      },
+      {
+        "id": "r1",
+        "role": 2
+      },
+      {
+        "id": "r2",
+        "role": 2
+      },
+      {
+        "id": "r3",
+        "role": 2
+      },
+      {
+        "id": "r4",
+        "role": 2
+      },
+      {
+        "id": "r5",
+        "role": 2
+      },
+      {
+        "id": "g1",
+        "role": 1
+      },
+      {
+        "id": "g2",
+        "role": 1
+      },
+      {
+        "id": "g3",
+        "role": 1
+      },
+      {
+        "id": "g4",
+        "role": 1
+      },
+      {
+        "id": "g5",
+        "role": 1
+      }
+    ],
+    "edges": [
+      {
+        "source_id": "a",
+        "target_id": "b",
+        "weight": 1
+      },
+      {
+        "source_id": "a",
+        "target_id": "g1",
+        "weight": 1
+      },
+      {
+        "source_id": "a",
+        "target_id": "r1",
+        "weight": 1
+      },
+      {
+        "source_id": "a",
+        "target_id": "r2",
+        "weight": 1
+      },
+      {
+        "source_id": "b",
+        "target_id": "a",
+        "weight": 1
+      },
+      {
+        "source_id": "b",
+        "target_id": "c",
+        "weight": 1
+      },
+      {
+        "source_id": "b",
+        "target_id": "d",
+        "weight": 1
+      },
+      {
+        "source_id": "b",
+        "target_id": "g2",
+        "weight": 1
+      },
+      {
+        "source_id": "c",
+        "target_id": "b",
+        "weight": 1
+      },
+      {
+        "source_id": "c",
+        "target_id": "e",
+        "weight": 1
+      },
+      {
+        "source_id": "c",
+        "target_id": "g3",
+        "weight": 1
+      },
+      {
+        "source_id": "c",
+        "target_id": "r3",
+        "weight": 1
+      },
+      {
+        "source_id": "d",
+        "target_id": "b",
+        "weight": 1
+      },
+      {
+        "source_id": "d",
+        "target_id": "e",
+        "weight": 1
+      },
+      {
+        "source_id": "d",
+        "target_id": "f",
+        "weight": 1
+      },
+      {
+        "source_id": "d",
+        "target_id": "r2",
+        "weight": 1
+      },
+      {
+        "source_id": "e",
+        "target_id": "c",
+        "weight": 1
+      },
+      {
+        "source_id": "e",
+        "target_id": "d",
+        "weight": 1
+      },
+      {
+        "source_id": "e",
+        "target_id": "g4",
+        "weight": 1
+      },
+      {
+        "source_id": "e",
+        "target_id": "r4",
+        "weight": 1
+      },
+      {
+        "source_id": "f",
+        "target_id": "d",
+        "weight": 1
+      },
+      {
+        "source_id": "f",
+        "target_id": "g5",
+        "weight": 1
+      },
+      {
+        "source_id": "f",
+        "target_id": "g4",
+        "weight": 1
+      },
+      {
+        "source_id": "f",
+        "target_id": "r5",
+        "weight": 1
+      }
+    ],
+    "start_id": "d"
+  }
+}

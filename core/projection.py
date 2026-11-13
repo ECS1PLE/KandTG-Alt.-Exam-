@@ -1,8 +1,8 @@
-from math import cos, sin, radians, sqrt
+from math import cos, sin, radians, sqrt, tau
 
 
 def project(coordinates, center=(0, 0, 0), rotation=(0, 0, 0)):
-    """Вращения X, затем Y, затем Z; экранная ось v смотрит вниз."""
+
     xyz = tuple(coordinates) + (0,) * (3 - len(coordinates))
     x, y, z = (xyz[i] - center[i] for i in range(3))
     a, b, c = map(radians, rotation)
@@ -15,6 +15,10 @@ def project(coordinates, center=(0, 0, 0), rotation=(0, 0, 0)):
 def projected_graph(graph, rotation=(0, 0, 0)):
     if not graph.vertices:
         return {}
+    if any(v.coordinates is None for v in graph.vertices):
+        return {v.id: (cos(tau * i / len(graph.vertices)),
+                       sin(tau * i / len(graph.vertices)), 0)
+                for i, v in enumerate(graph.vertices)}
     padded = [v.coordinates + (0,) * (3 - graph.dimension) for v in graph.vertices]
     center = tuple((min(p[i] for p in padded) + max(p[i] for p in padded)) / 2 for i in range(3))
     if graph.dimension == 3:

@@ -1,5 +1,5 @@
 class GraphError(ValueError):
-    """Ошибка данных с кодом, сообщением и путём к полю."""
+
 
     def __init__(self, code: str, message: str, path: str = "graph"):
         super().__init__(message)

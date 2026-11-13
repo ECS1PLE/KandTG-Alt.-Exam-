@@ -13,7 +13,7 @@ def parse_point(text: str, dimension: int):
         numbers = tuple(float(x.strip()) for x in parts)
     except ValueError:
         require(False, "INVALID_POINT", "Координаты должны быть числами с десятичной точкой.", "point")
-    require(all(is_number(x) for x in numbers), "INVALID_POINT", "NaN и бесконечность запрещены.", "point")
+    require(all(is_number(x) for x in numbers), "INVALID_POINT", "Неопределённые и бесконечные значения запрещены.", "point")
     require(all(x == 0 for x in numbers[dimension:]), "EXTRA_COORDINATE",
-            "Для 1D нужны y=z=0; для 2D нужен z=0.", "point")
+            "Для одномерного графа нужны y=z=0; для двумерного нужен z=0.", "point")
     return numbers[:dimension]

@@ -11,7 +11,7 @@
           0.0,
           0.0
         ],
-        "role": "ordinary"
+        "role": 0
       },
       {
         "id": "v1",
@@ -20,7 +20,7 @@
           0.0,
           0.0
         ],
-        "role": "ordinary"
+        "role": 0
       },
       {
         "id": "v2",
@@ -29,7 +29,7 @@
           0.0,
           0.0
         ],
-        "role": "ordinary"
+        "role": 0
       },
       {
         "id": "v3",
@@ -38,7 +38,7 @@
           1.0,
           0.0
         ],
-        "role": "ordinary"
+        "role": 0
       },
       {
         "id": "v4",
@@ -47,7 +47,7 @@
           1.0,
           0.0
         ],
-        "role": "ordinary"
+        "role": 0
       },
       {
         "id": "v5",
@@ -56,7 +56,7 @@
           1.0,
           0.0
         ],
-        "role": "ordinary"
+        "role": 0
       },
       {
         "id": "v6",
@@ -65,7 +65,7 @@
           2.0,
           0.0
         ],
-        "role": "ordinary"
+        "role": 0
       },
       {
         "id": "v7",
@@ -74,7 +74,7 @@
           2.0,
           0.0
         ],
-        "role": "ordinary"
+        "role": 0
       },
       {
         "id": "v8",
@@ -83,7 +83,7 @@
           2.0,
           0.0
         ],
-        "role": "ordinary"
+        "role": 0
       },
       {
         "id": "v9",
@@ -92,7 +92,7 @@
           0.0,
           1.0
         ],
-        "role": "ordinary"
+        "role": 0
       },
       {
         "id": "v10",
@@ -101,7 +101,7 @@
           0.0,
           1.0
         ],
-        "role": "ordinary"
+        "role": 0
       },
       {
         "id": "v11",
@@ -110,7 +110,7 @@
           0.0,
           1.0
         ],
-        "role": "ordinary"
+        "role": 0
       },
       {
         "id": "v12",
@@ -119,7 +119,7 @@
           1.0,
           1.0
         ],
-        "role": "ordinary"
+        "role": 0
       },
       {
         "id": "v13",
@@ -128,7 +128,7 @@
           1.0,
           1.0
         ],
-        "role": "ordinary"
+        "role": 0
       },
       {
         "id": "v14",
@@ -137,7 +137,7 @@
           1.0,
           1.0
         ],
-        "role": "ordinary"
+        "role": 0
       },
       {
         "id": "v15",
@@ -146,7 +146,7 @@
           2.0,
           1.0
         ],
-        "role": "ordinary"
+        "role": 0
       },
       {
         "id": "v16",
@@ -155,7 +155,7 @@
           2.0,
           1.0
         ],
-        "role": "ordinary"
+        "role": 0
       },
       {
         "id": "v17",
@@ -164,7 +164,7 @@
           2.0,
           1.0
         ],
-        "role": "ordinary"
+        "role": 0
       },
       {
         "id": "v18",
@@ -173,7 +173,7 @@
           0.0,
           2.0
         ],
-        "role": "ordinary"
+        "role": 0
       },
       {
         "id": "v19",
@@ -182,7 +182,7 @@
           0.0,
           2.0
         ],
-        "role": "ordinary"
+        "role": 0
       },
       {
         "id": "v20",
@@ -191,7 +191,7 @@
           0.0,
           2.0
         ],
-        "role": "ordinary"
+        "role": 0
       },
       {
         "id": "v21",
@@ -200,7 +200,7 @@
           1.0,
           2.0
         ],
-        "role": "ordinary"
+        "role": 0
       },
       {
         "id": "v22",
@@ -209,7 +209,7 @@
           1.0,
           2.0
         ],
-        "role": "ordinary"
+        "role": 0
       },
       {
         "id": "v23",
@@ -218,7 +218,7 @@
           1.0,
           2.0
         ],
-        "role": "ordinary"
+        "role": 0
       },
       {
         "id": "v24",
@@ -227,7 +227,7 @@
           2.0,
           2.0
         ],
-        "role": "ordinary"
+        "role": 0
       },
       {
         "id": "v25",
@@ -236,7 +236,7 @@
           2.0,
           2.0
         ],
-        "role": "ordinary"
+        "role": 0
       },
       {
         "id": "v26",
@@ -245,7 +245,7 @@
           2.0,
           2.0
         ],
-        "role": "ordinary"
+        "role": 0
       }
     ],
     "edges": [
@@ -790,6 +790,7 @@
         "weight": 1.0
       }
     ],
-    "start_id": null
+    "start_id": null,
+    "kind": "lattice"
   }
 }
